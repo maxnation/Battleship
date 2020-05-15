@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Battleship.Domain.Interfaces
 {
-    public interface IGenericRepository<TEntity> where TEntity : class
+    public interface IRepository<TEntity> where TEntity : class
     {
         void Create(TEntity item);
         
