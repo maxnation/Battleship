@@ -1,7 +1,4 @@
 ﻿using Battleship.Domain.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Battleship.Services.Interfaces
 {
