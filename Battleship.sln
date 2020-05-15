@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battleship", "Battleship\Battleship.csproj", "{260C4A81-2F35-4FD8-87EA-CD8F89278C07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Battleship", "Battleship\Battleship.csproj", "{260C4A81-2F35-4FD8-87EA-CD8F89278C07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battleship.Domain.Core", "Battleship.Domain.Core\Battleship.Domain.Core.csproj", "{9F7C8B23-ED41-4FC8-A513-F2645F247CDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battleship.Domain.Interfaces", "Battleship.Domain.Interfaces\Battleship.Domain.Interfaces.csproj", "{D0EB63A5-3AF8-4489-8C1C-6FA4D7D037FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battleship.Services.Interfaces", "Battleship.Services.Interfaces\Battleship.Services.Interfaces.csproj", "{AF35C347-25EF-4AEC-863D-B1FD2874B5A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{260C4A81-2F35-4FD8-87EA-CD8F89278C07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{260C4A81-2F35-4FD8-87EA-CD8F89278C07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{260C4A81-2F35-4FD8-87EA-CD8F89278C07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F7C8B23-ED41-4FC8-A513-F2645F247CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F7C8B23-ED41-4FC8-A513-F2645F247CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F7C8B23-ED41-4FC8-A513-F2645F247CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F7C8B23-ED41-4FC8-A513-F2645F247CDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0EB63A5-3AF8-4489-8C1C-6FA4D7D037FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0EB63A5-3AF8-4489-8C1C-6FA4D7D037FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0EB63A5-3AF8-4489-8C1C-6FA4D7D037FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0EB63A5-3AF8-4489-8C1C-6FA4D7D037FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF35C347-25EF-4AEC-863D-B1FD2874B5A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF35C347-25EF-4AEC-863D-B1FD2874B5A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF35C347-25EF-4AEC-863D-B1FD2874B5A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF35C347-25EF-4AEC-863D-B1FD2874B5A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
