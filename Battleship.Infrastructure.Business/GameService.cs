@@ -43,7 +43,7 @@ namespace Battleship.Infrastructure.Business
                 c.FieldId = field.Id;
             }
 
-            unitOfWork.ShipRepository.BulkCreate(ships);
+            unitOfWork.ShipRepository.CreateRange(ships);
 
             var freeCells = new List<Cell>(80);
 
@@ -64,7 +64,7 @@ namespace Battleship.Infrastructure.Business
                 }
             }
 
-            unitOfWork.CellRepository.BulkCreate(freeCells);
+            unitOfWork.CellRepository.CreateRange(freeCells);
 
             return field;
         }
