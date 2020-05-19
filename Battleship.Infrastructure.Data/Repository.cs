@@ -24,7 +24,7 @@ namespace Battleship.Infrastructure.Data
             context.SaveChanges();
         }
 
-        public void CreateBulk(IEnumerable<TEntity> entities)
+        public void CreateRange(IEnumerable<TEntity> entities)
         {
              set.AddRange(entities);
             context.SaveChanges();

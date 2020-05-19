@@ -8,7 +8,7 @@ namespace Battleship.Domain.Interfaces
     {
         void Create(TEntity item);
 
-        void BulkCreate(IEnumerable<TEntity> entities);
+        void CreateRange(IEnumerable<TEntity> entities);
 
         TEntity FindById(int id);
 

@@ -26,7 +26,14 @@ namespace Battleship
             services.AddDbContext<ApplicationDbContext>(options => options
             .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<IGameService, GameService>();           
+            services.AddTransient<IGameService, GameService>();
+            services.AddSession();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                });
             services.AddControllersWithViews();
         }
 
@@ -41,11 +48,13 @@ namespace Battleship
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

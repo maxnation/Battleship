@@ -28,10 +28,5 @@ namespace Battleship.Infrastructure.Data
         {
             Database.EnsureCreated();
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=testDb;Trusted_Connection=True;");
-        }
     }
 }
