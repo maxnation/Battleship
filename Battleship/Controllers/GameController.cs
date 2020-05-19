@@ -66,6 +66,28 @@ namespace Battleship.Controllers
             return Json(new { redirectToUrl = Url.Action("Index", "Game") });
         }
 
+        public IActionResult Game(int gameId)
+        {
+            uof.GameRepository.GetQueryable(g => g.Id == gameId)
+                .Include(g => g.Players)
+                .ThenInclude(p => p.Field)
+                .ThenInclude(f => f.Cells);
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ContinueGame(int gameId)
+        {
+            Game game = uof.GameRepository.GetQueryable()
+                  .Include(g => g.Players)
+                  .ThenInclude(p => p.Field)
+                  .Include(g => g.Players)
+                  .ThenInclude(p => p.User)
+                  .First(g => g.Id == gameId);
+
+            return View();
+        }
+
         [HttpGet]
         public IActionResult JoinGame(int id)
         {
