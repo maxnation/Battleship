@@ -2,13 +2,14 @@
 
 namespace Battleship.Domain.Core
 {
+    [Flags]
     public enum GameState
     {
-        Created,
-        WaitingForSecondPlayer,
-        WaitingForFieldsCreating,
-        Playing,
-        Finished
+        Created = 1,
+        WaitingForSecondPlayer = 2,
+        WaitingForBothFieldsCreated = 4,
+        Playing = 8,
+        Finished = 16
     }
 
     public static class GameStateHelper

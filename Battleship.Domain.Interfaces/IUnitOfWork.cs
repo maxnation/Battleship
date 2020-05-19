@@ -4,18 +4,18 @@ namespace Battleship.Domain.Interfaces
 {
     public interface IUnitOfWork
     {
-        IRepository<ApplicationUser> UserRepository { get; set; }
+        IRepository<ApplicationUser> UserRepository { get; }
 
-        IRepository<Player> PlayerRepository { get; set; }
+        IRepository<Player> PlayerRepository { get; }
 
-        IRepository<Field> FieldRepository { get; set; }
+        IRepository<Field> FieldRepository { get; }
 
-        IRepository<Game> GameRepository { get; set; }
+        IRepository<Game> GameRepository { get; }
 
-        IRepository<Cell> CellRepository { get; set; }
+        IRepository<Cell> CellRepository { get; }
 
-        IRepository<Ship> ShipRepository { get; set; }
+        IRepository<Ship> ShipRepository { get; }
 
-        IRepository<Step> StepRepository { get; set; }
+        IRepository<Step> StepRepository { get; }
     }
 }

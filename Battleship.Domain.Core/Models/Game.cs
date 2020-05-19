@@ -7,7 +7,7 @@ namespace Battleship.Domain.Core
         public int Id { get; set; }
 
         public GameState State { get; set; }
-        
+
         public virtual ICollection<Player> Players { get; set; }
 
         public Game()

@@ -1,11 +1,11 @@
 ﻿namespace Battleship.Domain.Core
 {
-    public enum State
+    public enum CellState
     {
-        Free,
-        Occupied,
-        Hit,
-        Miss,
-        OpenedAsNeighboring,
+        Free = 0,
+        Occupied = 1,
+        Hit = 2,
+        Miss = 3,
+        OpenedAsNeighboring = 4,
     }
 }
