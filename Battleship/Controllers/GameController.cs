@@ -40,5 +40,30 @@ namespace Battleship.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult CreateField([FromBody]  IEnumerable<CreateShipViewModel> model)
+        {
+            List<Ship> ships = new List<Ship>();
+
+            foreach (var shipVM in model)
+            {
+                Ship ship = new Ship
+                {
+                    Size = (byte)shipVM.Size,
+                    XP = (byte)shipVM.Size
+                };
+
+                foreach (var cellVM in shipVM.Cells)
+                {
+                    ship.Cells.Add(new Cell { LineNo = (byte)cellVM.LineNo, ColumnNo = (byte)cellVM.ColumnNo });
+                }
+
+                ships.Add(ship);
+            }
+            gameService.CreateField(HttpContext.Session.GetInt32("playerId").Value, ships);
+
+            return Json(new { redirectToUrl = Url.Action("Index", "Game") });
+        }     
     }
 }
