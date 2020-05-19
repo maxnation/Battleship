@@ -144,7 +144,29 @@ namespace Battleship.Infrastructure.Business
 
         public bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId)
         {
-            throw new NotImplementedException();
+            bool hit = false;
+
+            int fieldId = unitOfWork.FieldRepository.Get(f => f.PlayerId == rivalId).First().Id;
+
+            Cell cell = unitOfWork.CellRepository.FirstOrDefault(c => c.FieldId == fieldId && c.LineNo == lineNo && c.ColumnNo == columnNo);
+
+            Step step = new Step { CellId = cell.Id, PlayerId = playerId };
+
+            if (cell.State == CellState.Free)
+            {
+                cell.State = CellState.Miss;
+                step.Hit = hit = false;
+            }
+            else if (cell.State == CellState.Occupied)
+            {
+                cell.State = CellState.Hit;
+                step.Hit = hit = true;
+            }
+
+            unitOfWork.StepRepository.Create(step);
+            unitOfWork.CellRepository.Update(cell);
+
+            return hit;
         }
 
         public void GetUserGamesList(string username,
