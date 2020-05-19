@@ -64,6 +64,18 @@ namespace Battleship.Controllers
             gameService.CreateField(HttpContext.Session.GetInt32("playerId").Value, ships);
 
             return Json(new { redirectToUrl = Url.Action("Index", "Game") });
-        }     
+        }
+
+        [HttpGet]
+        public IActionResult JoinGame(int id)
+        {
+            Game game = gameService.JoinGame(id, User.Identity.Name);
+
+            int playerId = game.Players.First(p => p.User.Email == User.Identity.Name).Id;
+            HttpContext.Session.SetInt32("gameId", id);
+            HttpContext.Session.SetInt32("playerId", playerId);
+
+            return RedirectToAction("CreateField");
+        }
     }
 }
