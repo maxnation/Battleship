@@ -1,19 +1,26 @@
 ﻿using Battleship.Domain.Core;
+using System.Collections.Generic;
 
 namespace Battleship.Services.Interfaces
 {
     public interface IGameService
     {
-        void CreateGame(int userId);
+        Game CreateGame(int userId);
 
-        void CreateField(int gameId, int playerId);
+        Game CreateGame(string username);
 
-        void MakeMove(Step step, int gameId, int playerId);
+        Game CreateGame(ApplicationUser user);
 
-        void JoinGame(int gameId, int userId);
+        Field CreateField(int playerId, IEnumerable<Ship> ships);
 
-        void JoinGame(int gameId, string username);
+        bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId);
 
-        void JoinGame(int gameId, ApplicationUser user);
+        Game JoinGame(int gameId, int userId);
+
+        Game JoinGame(int gameId, string username);
+
+        Game JoinGame(int gameId, ApplicationUser user);
+
+        void GetUserGamesList(string username, out IEnumerable<Game> userFreeGames, out IEnumerable<Game> othersFreeGames, out IEnumerable<Game> activeGames);
     }
 }
