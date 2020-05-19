@@ -24,18 +24,24 @@ namespace Battleship.Infrastructure.Business
 
         public Game CreateGame(int userId)
         {
-            throw new NotImplementedException();
+            ApplicationUser user = unitOfWork.UserRepository.FindById(userId);
+            return CreateGame(user);
         }
 
         public Game CreateGame(string username)
         {
-            throw new NotImplementedException();
+            ApplicationUser user = unitOfWork.UserRepository.FirstOrDefault(u => u.Email == username);
+            return CreateGame(user);
         }
 
         public Game CreateGame(ApplicationUser user)
         {
-            throw new NotImplementedException();
+            Game game = new Game { State = GameState.Created | GameState.WaitingForSecondPlayer };
+            unitOfWork.GameRepository.Create(game);
+            this.CreatePlayer(user, game.Id);
+            return game;
         }
+
         private Player CreatePlayer(int userId, int gameId)
         {
             ApplicationUser user = unitOfWork.UserRepository.FindById(userId);
