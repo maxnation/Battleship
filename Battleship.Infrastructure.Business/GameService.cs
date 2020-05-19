@@ -36,20 +36,28 @@ namespace Battleship.Infrastructure.Business
         {
             throw new NotImplementedException();
         }
-
         private Player CreatePlayer(int userId, int gameId)
         {
-            throw new NotImplementedException();
+            ApplicationUser user = unitOfWork.UserRepository.FindById(userId);
+            return CreatePlayer(user, gameId);
         }
 
         private Player CreatePlayer(string username, int gameId)
         {
-            throw new NotImplementedException();
+            ApplicationUser user = unitOfWork.UserRepository.Get(u => u.Email == username).First();
+            return CreatePlayer(user, gameId);
         }
 
         private Player CreatePlayer(ApplicationUser user, int gameId)
         {
-            throw new NotImplementedException();
+            Player player = new Player
+            {
+                UserId = user.Id,
+                GameId = gameId
+            };
+            user.Players.Add(player);
+            unitOfWork.UserRepository.Update(user);
+            return player;
         }
 
         public Game JoinGame(int gameId, int userId)
