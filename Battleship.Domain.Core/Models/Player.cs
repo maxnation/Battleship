@@ -12,6 +12,8 @@ namespace Battleship.Domain.Core
 
         public virtual Game Game { get; set; }
 
+        public int GameId { get; set; }
+
         public virtual Field Field { get; set; }
 
         public bool IsWinner { get; set; }
