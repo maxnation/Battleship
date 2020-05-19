@@ -77,5 +77,52 @@ namespace Battleship.Controllers
 
             return RedirectToAction("CreateField");
         }
+
+        public IActionResult Index()
+        {
+            string username = User.Identity.Name;
+
+            IEnumerable<Game> activeGames = new List<Game>();
+            IEnumerable<Game> userFreeGames = new List<Game>();
+            IEnumerable<Game> othersFreeGames = new List<Game>();
+            gameService.GetUserGamesList(username, out userFreeGames, out othersFreeGames, out activeGames);
+
+            var userFreeGamesDescriptions = userFreeGames?
+                .Select(g => new GameDescriptionViewModel
+                {
+                    GameState = g.State.GetConstantName(),
+                    FirstPlayerUsername = g.Players.FirstOrDefault()?.User?.Email,
+                    Id = g.Id,
+                })
+          ?.ToList();
+
+            var otherFreeGamesDescriptions = othersFreeGames?
+          .Select(g => new GameDescriptionViewModel
+          {
+              GameState = g.State.GetConstantName(),
+              FirstPlayerUsername = g.Players.FirstOrDefault()?.User?.Email,
+              Id = g.Id
+          })
+          ?.ToList();
+
+            var activeGamesDescription = activeGames?
+                  .Select(g => new GameDescriptionViewModel
+                  {
+                      Id = g.Id,
+                      GameState = "Playing",
+                      FirstPlayerUsername = username,
+                      SecondPlayerUsername = g.Players
+                      .FirstOrDefault(p => p.User.Email != username)?.User?.Email
+                  })
+                ?.ToList();
+
+            GameListViewModel gListVM = new GameListViewModel
+            {
+                PlayerFreeGames = userFreeGamesDescriptions,
+                PendingGames = activeGamesDescription,
+                OthersFreeGames = otherFreeGamesDescriptions
+            };
+            return View(gListVM);
+        }
     }
 }
