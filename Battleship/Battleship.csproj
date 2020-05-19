@@ -18,7 +18,6 @@
     <ProjectReference Include="..\Battleship.Domain.Interfaces\Battleship.Domain.Interfaces.csproj" />
     <ProjectReference Include="..\Battleship.Infrastructure.Business\Battleship.Infrastructure.Business.csproj" />
     <ProjectReference Include="..\Battleship.Services.Interfaces\Battleship.Services.Interfaces.csproj" />
-    <ProjectReference Include="E:\Battleship\Battleship.Infrastructure.Data\Battleship.Infrastructure.Data.csproj" />
   </ItemGroup>
 
 </Project>
