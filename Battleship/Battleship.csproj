@@ -4,4 +4,20 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Battleship.Domain.Core\Battleship.Domain.Core.csproj" />
+    <ProjectReference Include="..\Battleship.Domain.Interfaces\Battleship.Domain.Interfaces.csproj" />
+    <ProjectReference Include="..\Battleship.Infrastructure.Business\Battleship.Infrastructure.Business.csproj" />
+    <ProjectReference Include="..\Battleship.Services.Interfaces\Battleship.Services.Interfaces.csproj" />
+    <ProjectReference Include="E:\Battleship\Battleship.Infrastructure.Data\Battleship.Infrastructure.Data.csproj" />
+  </ItemGroup>
+
 </Project>
