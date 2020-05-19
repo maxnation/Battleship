@@ -68,17 +68,31 @@ namespace Battleship.Infrastructure.Business
 
         public Game JoinGame(int gameId, int userId)
         {
-            throw new NotImplementedException();
+            Player player = new Player { UserId = userId, GameId = gameId };
+            unitOfWork.PlayerRepository.Create(player);
+
+            Game game = unitOfWork.GameRepository.GetQueryable(g => g.Id == gameId)
+                .Include(g => g.Players)
+                .ThenInclude(p => p.UserId)
+                .First();
+
+            game.State = GameState.WaitingForBothFieldsCreated;
+            unitOfWork.GameRepository.Update(game);
+
+            return game;
         }
 
         public Game JoinGame(int gameId, string username)
         {
-            throw new NotImplementedException();
+            int userId = unitOfWork.UserRepository
+                .FirstOrDefault(u => u.Email == username).Id;
+
+            return this.JoinGame(gameId, userId);
         }
 
         public Game JoinGame(int gameId, ApplicationUser user)
         {
-            throw new NotImplementedException();
+            return this.JoinGame(gameId, user.Id);
         }
 
         public bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId)
