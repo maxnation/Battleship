@@ -170,9 +170,33 @@ namespace Battleship.Infrastructure.Business
         }
 
         public void GetUserGamesList(string username,
-            out IEnumerable<Game> userFreeGames, out IEnumerable<Game> othersFreeGames, out IEnumerable<Game> activeGames)
+             out IEnumerable<Game> userFreeGames, out IEnumerable<Game> othersFreeGames, out IEnumerable<Game> activeGames)
         {
-            throw new NotImplementedException();
+            var user = unitOfWork.UserRepository.GetQueryable()
+                       .Where(u => u.Email == username)
+                           .Include(u => u.Players)
+                           .ThenInclude(p => p.Game)
+                           .ThenInclude(g => g.Players)
+                           .ThenInclude(p => p.User)
+                           .First();
+
+            // Games of current User without second player
+            userFreeGames = user.Players
+               .Select(p => p.Game)
+               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer))
+               .ToList();
+
+            // Games of other Users without second player
+            othersFreeGames = unitOfWork.GameRepository.GetQueryable()
+               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer))
+               .Where(g => g.Players.FirstOrDefault().User.Id != user.Id).Include(g => g.Players).ThenInclude(p => p.User)
+               .ToList();
+
+            // Active games of current User        
+            activeGames = user.Players
+                .Select(p => p.Game)
+                .Where(g => g.State == GameState.Playing)?
+                .ToList();
         }
     }
 }
