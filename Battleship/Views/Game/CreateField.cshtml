@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Http;
+@{
+    ViewData["Title"] = "CreateField";
+}
+
+<h1>CreateField</h1>
+
+<p>Game Id: @Context.Session.GetInt32("gameId")</p>
+
+<p>Player Id: @Context.Session.GetInt32("playerId")</p>
+
+<div id="shipsPanel"></div>
+<div>
+    <div id="fieldContainer"></div>
+    <button id="createField">Create</button>
+</div>
+
+
+<script src="~/js/createField.js"></script>

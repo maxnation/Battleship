@@ -1,0 +1,67 @@
+﻿@model Battleship.Models.GameListViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Active games: </h2>
+
+<table>
+    <tr>
+        <th>Game No.</th>
+        <th>First Player</th>
+        <th>Second Player</th>
+        <th>State</th>
+    </tr>
+    @foreach (var game in Model.PendingGames)
+    {
+        <tr>
+            <td>@game.Id</td>
+            <td>@game.FirstPlayerUsername</td>
+            <td>@game.SecondPlayerUsername</td>
+            <td>@game.GameState</td>
+            <td><a asp-controller="Game" asp-action="Continue" asp-route-id="@game.Id">Resume</a></td>
+        </tr>
+    }
+</table>
+
+
+<h2>My games waiting for second player: </h2>
+<table>
+    <tr>
+        <th>Game No.</th>
+        <th>First Player</th>
+        <th>Second Player</th>
+        <th>State</th>
+    </tr>
+    @foreach (var game in Model.PlayerFreeGames)
+    {
+        <tr>
+            <td>@game.Id</td>
+            <td>@game.FirstPlayerUsername</td>
+            <td>@game.SecondPlayerUsername</td>
+            <td>@game.GameState</td>
+            <td><a asp-controller="Game" asp-action="Continue" asp-route-id="@game.Id">Resume</a></td>
+
+        </tr>
+    }
+</table>
+
+<h2>Free games: </h2>
+<table>
+    <tr>
+        <th>Game No.</th>
+        <th>First Player</th>
+        <th>Second Player</th>
+        <th>State</th>
+    </tr>
+    @foreach (var game in Model.OthersFreeGames)
+    {
+        <tr>
+            <td>@game.Id</td>
+            <td>@game.FirstPlayerUsername</td>
+            <td>@game.SecondPlayerUsername</td>
+            <td>@game.GameState</td>
+            <td><a asp-controller="Game" asp-action="JoinGame" asp-route-id="@game.Id">Join</a></td>
+        </tr>
+    }
+</table>
