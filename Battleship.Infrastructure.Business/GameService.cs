@@ -19,7 +19,54 @@ namespace Battleship.Infrastructure.Business
 
         public Field CreateField(int playerId, IEnumerable<Ship> ships)
         {
-            throw new NotImplementedException();
+            Field field = new Field { PlayerId = playerId };
+            unitOfWork.FieldRepository.Create(field);
+
+            Game game = unitOfWork.GameRepository
+                .GetQueryable()
+                .Where(g => g.Players.Any(p => p.Id == playerId))
+                .First();
+
+            if (game.State == (GameState.Created | GameState.WaitingForSecondPlayer))
+            {
+                game.State = GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated;
+            }
+            else if (game.State == (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
+            {
+                game.State = GameState.Playing;
+            }
+            var occupiedCells = ships.SelectMany(s => s.Cells);
+
+            foreach (var c in occupiedCells)
+            {
+                c.State = CellState.Occupied;
+                c.FieldId = field.Id;
+            }
+
+            unitOfWork.ShipRepository.BulkCreate(ships);
+
+            var freeCells = new List<Cell>(80);
+
+            for (byte line = 0; line < 10; line++)
+            {
+                for (byte column = 0; column < 10; column++)
+                {
+                    if (!occupiedCells.Any(c => c.LineNo == line && c.ColumnNo == column))
+                    {
+                        freeCells.Add(new Cell
+                        {
+                            LineNo = line,
+                            ColumnNo = column,
+                            FieldId = field.Id,
+                            State = CellState.Free
+                        });
+                    }
+                }
+            }
+
+            unitOfWork.CellRepository.BulkCreate(freeCells);
+
+            return field;
         }
 
         public Game CreateGame(int userId)
