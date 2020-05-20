@@ -7,7 +7,6 @@ using Battleship.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -67,19 +66,31 @@ namespace Battleship.Controllers
             return Json(new { redirectToUrl = Url.Action("Index", "Game") });
         }
 
-        public IActionResult Game(int gameId)
+        public JsonResult GetGameData([FromBody] int id)
         {
-            uof.GameRepository.GetQueryable(g => g.Id == gameId)
-                .Include(g => g.Players)
-                .ThenInclude(p => p.Field)
-                .ThenInclude(f => f.Cells);
-            return View();
+
+            GameViewModel gameVM = GameMap.GetGameViewModel(uof.GameRepository, User.Identity.Name, id);
+            Step lastStep = uof.StepRepository
+                .GetQueryable().OrderByDescending(s => s.StepNo)
+                .Take(1)
+                .FirstOrDefault();
+
+            if (lastStep != null)
+            {
+                gameVM.NextTurnPlayerId = lastStep.PlayerId.Value;
+            }
+            else
+            {
+                int randomVal = 1; //new Random().Next(0, 2);
+                gameVM.NextTurnPlayerId = randomVal == 0 ? gameVM.Player.PlayerId : gameVM.Rival.PlayerId;
+            }
+
+            return Json(gameVM);
         }
 
-        [HttpGet]
-        public IActionResult ContinueGame(int id)
-        {          
-            GameViewModel gameVM = GameMap.GetGameViewModel(uof.GameRepository, User.Identity.Name, id);       
+        public IActionResult Game(int id)
+        {
+            ViewData["gameId"] = id;
             return View("Game");
         }
 
