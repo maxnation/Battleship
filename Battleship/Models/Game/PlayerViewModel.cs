@@ -7,5 +7,10 @@
         public string Username { get; set; }
 
         public FieldViewModel Field { get; set; }
+
+        public PlayerViewModel()
+        {
+            Field = new FieldViewModel();
+        }
     }
 }

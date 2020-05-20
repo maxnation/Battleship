@@ -9,5 +9,11 @@
         public PlayerViewModel Rival { get; set; }
 
         public int NextTurnPlayerId { get; set; } // Для вывода юзернейма пользователя, чья очередь ходить
+
+        public GameViewModel()
+        {
+            Player = new PlayerViewModel();
+            Rival = new PlayerViewModel();
+        }
     }
 }
