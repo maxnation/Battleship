@@ -1,5 +1,6 @@
 ﻿using Battleship.Domain.Core;
 using Battleship.Domain.Interfaces;
+using Battleship.Mapping;
 using Battleship.Models;
 using Battleship.Models.FieldCreation;
 using Battleship.Services.Interfaces;
@@ -23,7 +24,7 @@ namespace Battleship.Controllers
             this.uof = uof;
             this.gameService = gameService;
         }
-   
+
         [HttpGet]
         public IActionResult CreateGame()
         {
@@ -76,16 +77,10 @@ namespace Battleship.Controllers
         }
 
         [HttpGet]
-        public IActionResult ContinueGame(int gameId)
-        {
-            Game game = uof.GameRepository.GetQueryable()
-                  .Include(g => g.Players)
-                  .ThenInclude(p => p.Field)
-                  .Include(g => g.Players)
-                  .ThenInclude(p => p.User)
-                  .First(g => g.Id == gameId);
-
-            return View();
+        public IActionResult ContinueGame(int id)
+        {          
+            GameViewModel gameVM = GameMap.GetGameViewModel(uof.GameRepository, User.Identity.Name, id);       
+            return View("Game");
         }
 
         [HttpGet]
