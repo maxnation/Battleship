@@ -1,0 +1,37 @@
+﻿<h1>Game</h1>
+<h2 id="statusBar"></h2>
+<div id="playerPanel">
+    <p>Your field</p>
+    <p id="playerUsernameParagraph"></p>
+    <div class="fieldContainer" id="playerField">
+    </div>
+</div>
+<div id="rivalPanel">
+    <p>Rival's field</p>
+    <p id="rivalUsernameParagraph"></p>
+    <div class="fieldContainer" id="rivalField"></div>
+</div>
+
+@section Scripts{
+    <script src="~/js/initializeGame.js"></script>
+    <script>
+        $(document).ready(function () {
+            var id = JSON.stringify(@ViewData["gameId"]);
+            $.ajax({
+                url: '@Url.Action("GetGameData", "Game")',
+                data: id,
+                dataType: "json",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    console.log(data);
+                    InitializeGame(data);
+                },
+                error: function (result) {
+                    console.log(result);
+                }
+            });
+        });
+    </script>
+}
+<link rel="stylesheet" href="~/css/game.css" />
