@@ -183,7 +183,8 @@ namespace Battleship.Infrastructure.Business
             // Games of current User without second player
             userFreeGames = user.Players
                .Select(p => p.Game)
-               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer))
+               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer) ||
+               g.State ==  (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
                .ToList();
 
             // Games of other Users without second player
