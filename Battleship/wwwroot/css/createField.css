@@ -1,0 +1,48 @@
+﻿#shipsPanel{
+    float:right;
+    width:40%;
+}
+
+#fieldPanel {
+    width: 60%;
+}
+
+div.ship{
+    background-color: royalblue;
+    height: 30px;
+    border: 1px solid black;
+}
+
+div.singledeck{
+width: 30px;
+}
+
+div.doubledeck {
+    width: 60px;
+}
+
+div.threedeck {
+    width: 90px;
+}
+
+div.fourdeck {
+    width: 120px;
+}
+
+
+#fieldContainer table {
+    border: 1px solid red;
+}
+
+#fieldContainer div {
+    width: 30px;
+    height: 30px;
+}
+
+div.freeCell {
+    background-color: lightgray;
+}
+
+div.occupiedCell {
+    background-color: lightgreen;
+}
