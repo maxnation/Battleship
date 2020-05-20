@@ -19,7 +19,7 @@
             <td>@game.FirstPlayerUsername</td>
             <td>@game.SecondPlayerUsername</td>
             <td>@game.GameState</td>
-            <td><a asp-controller="Game" asp-action="Continue" asp-route-id="@game.Id">Resume</a></td>
+            <td><a asp-controller="Game" asp-action="ContinueGame" asp-route-id="@game.Id">Resume</a></td>
         </tr>
     }
 </table>
@@ -40,7 +40,7 @@
             <td>@game.FirstPlayerUsername</td>
             <td>@game.SecondPlayerUsername</td>
             <td>@game.GameState</td>
-            <td><a asp-controller="Game" asp-action="Continue" asp-route-id="@game.Id">Resume</a></td>
+            <td><a asp-controller="Game" asp-action="ContinueGame" asp-route-id="@game.Id">Resume</a></td>
 
         </tr>
     }
