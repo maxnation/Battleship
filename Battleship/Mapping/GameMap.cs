@@ -43,7 +43,7 @@ namespace Battleship.Mapping
                 Id = cell.Id,
                 LineNo = cell.LineNo,
                 ColumnNo = cell.ColumnNo,
-                State = cell.State
+                State = cell.State.GetConstantName()
             }).ToList();
 
             List<CellViewModel> rivalCellViewModels = rival.Field.Cells.Select(cell => new CellViewModel
@@ -51,7 +51,7 @@ namespace Battleship.Mapping
                 Id = cell.Id,
                 LineNo = cell.LineNo,
                 ColumnNo = cell.ColumnNo,
-                State = cell.State
+                State = cell.State.GetConstantName()
             }).ToList();
 
             gameVM.Player.Field.Cells = playerCellViewModels;
