@@ -10,6 +10,6 @@ namespace Battleship.Models
 
         public int ColumnNo { get; set; }
 
-        public CellState State { get; set; }
+        public string State { get; set; }
     }
 }
