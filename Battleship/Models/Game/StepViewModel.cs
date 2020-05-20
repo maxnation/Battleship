@@ -6,10 +6,10 @@
 
         public int RivalId { get; set; }
 
-        public int GameId { get; set; }
-
         public int LineNo { get; set; }
 
         public int ColumnNo { get; set; }
+
+        public bool IsHit { get; set; }
     }
 }
