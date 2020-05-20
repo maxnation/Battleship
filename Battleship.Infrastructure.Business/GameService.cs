@@ -31,10 +31,11 @@ namespace Battleship.Infrastructure.Business
             {
                 game.State = GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated;
             }
-            else if (game.State == (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
+            else if (game.State == GameState.WaitingForBothFieldsCreated)
             {
                 game.State = GameState.Playing;
             }
+            unitOfWork.GameRepository.Update(game);
             var occupiedCells = ships.SelectMany(s => s.Cells);
 
             foreach (var c in occupiedCells)
@@ -189,7 +190,8 @@ namespace Battleship.Infrastructure.Business
 
             // Games of other Users without second player
             othersFreeGames = unitOfWork.GameRepository.GetQueryable()
-               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer))
+               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer) ||
+               g.State == (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
                .Where(g => g.Players.FirstOrDefault().User.Id != user.Id).Include(g => g.Players).ThenInclude(p => p.User)
                .ToList();
 
