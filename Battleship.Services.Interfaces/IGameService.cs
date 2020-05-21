@@ -13,7 +13,7 @@ namespace Battleship.Services.Interfaces
 
         Field CreateField(int playerId, IEnumerable<Ship> ships);
 
-        bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId);
+        bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId, out bool isHit, out bool isGameOver);
 
         Game JoinGame(int gameId, int userId);
 
