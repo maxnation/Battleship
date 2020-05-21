@@ -143,31 +143,93 @@ namespace Battleship.Infrastructure.Business
             return this.JoinGame(gameId, user.Id);
         }
 
-        public bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId)
+        public bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId,
+            out bool isHit, out bool isGameOver)
         {
-            bool hit = false;
+            isGameOver = false;
+            
+            Cell cell = unitOfWork.CellRepository
+                .GetQueryable().Include(c => c.Ship)
+                .FirstOrDefault(c => c.LineNo == lineNo && c.ColumnNo == columnNo
+                 && c.Field.PlayerId == rivalId);
 
-            int fieldId = unitOfWork.FieldRepository.Get(f => f.PlayerId == rivalId).First().Id;
+            this.ChangeCellState(cell, out isHit, rivalId, playerId, out isGameOver);
+            this.SaveStep(playerId, rivalId, cell.Id, isHit);
+          
+            return isHit;
+        }
 
-            Cell cell = unitOfWork.CellRepository.FirstOrDefault(c => c.FieldId == fieldId && c.LineNo == lineNo && c.ColumnNo == columnNo);
+        private void CheckRivalXP(int rivalId, int playerId, out bool isGameOver)
+        {
+            isGameOver = false;
+            int totalXP;
+            this.GetRivalXP(rivalId, out totalXP);
+            if (totalXP == 0)
+            {
+                Player player = new Player { Id = playerId, IsWinner = true };
+                unitOfWork.PlayerRepository.Update(player);
+                isGameOver = true;
+            }
+        }
 
-            Step step = new Step { CellId = cell.Id, PlayerId = playerId };
-
+        private void ChangeCellState(Cell cell, out bool isHit, int rivalId, int playerId, out bool isGameOver)
+        {
+            isHit = false;
+            isGameOver = false;
             if (cell.State == CellState.Free)
             {
                 cell.State = CellState.Miss;
-                step.Hit = hit = false;
             }
             else if (cell.State == CellState.Occupied)
             {
                 cell.State = CellState.Hit;
-                step.Hit = hit = true;
+                isHit = true;
+                this.SubtractShipXP(cell.Ship);
+                this.CheckRivalXP(rivalId, playerId, out isGameOver);
+            }
+            unitOfWork.CellRepository.Update(cell);
+        }
+
+        private void GetRivalXP(int rivalId, out int totalXP)
+        {
+            var ships = unitOfWork.FieldRepository.GetQueryable()
+                  .Include(f => f.Cells).ThenInclude(c => c.Ship)
+                  .FirstOrDefault(f => f.PlayerId == rivalId)
+                  .Cells.Select(c => c.Ship).Distinct();
+            totalXP = ships.Sum(s => s!=null? s.XP : 0);
+         }
+
+        private void SaveStep(int playerId, int rivalId, int cellId, bool isHit)
+        {
+            int lastStepNo;
+            var query = unitOfWork.StepRepository
+                .GetQueryable()
+                .Where(s => s.PlayerId == playerId || s.PlayerId == rivalId);
+
+            if (query.Any())
+            {
+                lastStepNo = query.Max(s => s.StepNo);
+            }
+            else
+            {
+                lastStepNo = 0;
             }
 
-            unitOfWork.StepRepository.Create(step);
-            unitOfWork.CellRepository.Update(cell);
+            Step step = new Step
+            {
+                CellId = cellId,
+                PlayerId = playerId,
+                StepNo = ++lastStepNo,
+                Hit = isHit
+            };
 
-            return hit;
+            unitOfWork.StepRepository.Create(step);
+        }
+
+        private void SubtractShipXP(Ship ship)
+        {
+            ship.XP--;
+            unitOfWork.ShipRepository.Update(ship);
         }
 
         public void GetUserGamesList(string username,
@@ -185,7 +247,7 @@ namespace Battleship.Infrastructure.Business
             userFreeGames = user.Players
                .Select(p => p.Game)
                .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer) ||
-               g.State ==  (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
+               g.State == (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
                .ToList();
 
             // Games of other Users without second player
