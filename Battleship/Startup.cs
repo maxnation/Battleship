@@ -1,3 +1,4 @@
+using Battleship.Domain.Core;
 using Battleship.Domain.Interfaces;
 using Battleship.Infrastructure.Business;
 using Battleship.Infrastructure.Data;
@@ -34,6 +35,8 @@ namespace Battleship
                 {
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
+
+            services.AddSignalR();
             services.AddControllersWithViews();
         }
 
@@ -62,6 +65,7 @@ namespace Battleship
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHub<GameHub>("/battleship");
             });
         }
     }
