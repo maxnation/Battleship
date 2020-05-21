@@ -12,7 +12,7 @@ function drawField() {
     var lines = 10;
     var columns = 10;
 
-    var fieldContainer = document.getElementById("fieldContainer");
+    var fieldContainer = document.getElementsByClassName("fieldContainer")[0];
     var table = document.createElement("table");
 
     for (var line = 0; line < lines; line++) {
