@@ -4,14 +4,8 @@
 
     setUsername("playerUsernameParagraph", data.player.username);
     setUsername("rivalUsernameParagraph", data.rival.username);
-
-    if (data.nextTurnPlayerId == data.player.playerId) {
-        document.getElementById("statusBar").innerText = "It's your turn!";
-    }
-    else {
-        document.getElementById("statusBar").innerText = "Your rival makes a move...";
-    }
-
+    this.switchControl(data.nextTurnPlayerId);
+ 
     bus.trigger('signalr-join-game', { gameId: data.gameId, username: data.player.username });
 });
 
@@ -40,24 +34,18 @@ function drawField(fieldContainerId, data, isRivalField) {
                     "isHit" : false
                 }
                 hubConnection.invoke("MakeStep", stepVM, data.gameId);
-                    console.log('line: ' + event.srcElement.dataset.line + ' col: '
-                        + event.srcElement.dataset.column + ' state: ' + event.srcElement.className
-                        + ' playerId: ' + data.player.playerId + ' rivalId: ' + data.rival.playerId);
                 });
-
             td.appendChild(div);
             tr.appendChild(td);
         }
         table.appendChild(tr);
     }
     fieldContainer.appendChild(table);
-    console.log(data);
+
     if (isRivalField) {
-        console.log(data.rival)
         fillField(fieldContainerId, data.rival.field.cells, isRivalField);
     }
     else {
-        console.log(data.player)
         fillField(fieldContainerId, data.player.field.cells, isRivalField);
     }
 }
@@ -69,15 +57,11 @@ function fillField(fieldContainerId, fieldData, isRivalField) {
     }
 }
 
-
 function setUsername(usernameParagraphId, username) {
-    console.log("Email: " + username)
     document.getElementById(usernameParagraphId).innerText = username;
 }
 
 function setCellClass(cell, state, isRivalField) {
-
-
     switch (state) {
         case "Free":
             cell.className = "freeCell";
@@ -101,4 +85,23 @@ function setCellClass(cell, state, isRivalField) {
                 cell.className = "playerHitCell";
             }            break;
     }
+}
+
+function switchControl(nextPlayerId) {
+    if (nextPlayerId == PLAYER_ID) {
+        document.getElementById("statusBar").innerText = "It's your turn!";
+        unfreezeRivalField();
+    }
+    else {
+        document.getElementById("statusBar").innerText = "Your rival makes a move...";
+        freezeRivalField();
+    }
+}
+
+function freezeRivalField() {
+    document.getElementById("rivalField").style.pointerEvents = 'none';
+}
+
+function unfreezeRivalField() {
+    document.getElementById("rivalField").style.pointerEvents = 'visible'; 
 }
