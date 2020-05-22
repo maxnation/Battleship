@@ -15,6 +15,9 @@
 @section Scripts{
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
     <script>
+        var PLAYER_ID;
+        var RIVAL_ID;
+
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/battleship")
             .build();
@@ -31,7 +34,9 @@
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    console.log(data);
+                    PLAYER_ID = data.player.playerId;
+                    RIVAL_ID = data.rival.playerId;
+
                     bus.trigger('initialize-game', data);
                 },
                 error: function (result) {
@@ -46,6 +51,32 @@
              setTimeout(function () {
                  hubConnection.invoke("JoinGame", data.gameId, data.username);
              }, 500);  
+        });
+
+        hubConnection.on("receiveStep", function (stepVM) {
+            let newState;
+            if (stepVM.isHit) {
+                newState = "Hit";
+            }
+            else {
+                newState = "Miss";
+            }
+            
+            if (stepVM.playerId == PLAYER_ID) {    
+                let rivalCell = document.querySelector('#rivalField' + ' [data-line="' + stepVM.lineNo + '"][data-column="' + stepVM.columnNo + '"]');
+                setCellClass(rivalCell, newState, true);
+
+                if (newState != "Hit") {
+                    switchControl(RIVAL_ID);
+                }
+            }
+            else if (stepVM.playerId == RIVAL_ID) {       
+                let playerCell = document.querySelector('#playerField' + ' [data-line="' + stepVM.lineNo + '"][data-column="' + stepVM.columnNo + '"]');         
+                setCellClass(playerCell, newState, false);
+                if (newState != "Hit") {
+                    switchControl(PLAYER_ID);
+                }
+            }
         });
 
         hubConnection.on("joinGameLog", function (username, gameId) {
