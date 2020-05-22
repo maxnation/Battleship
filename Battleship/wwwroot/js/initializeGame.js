@@ -1,4 +1,4 @@
-﻿function InitializeGame(data) {
+﻿bus.on('initialize-game', function (e, data) {
     drawField("playerField", data, false);
     drawField("rivalField", data, true);
 
@@ -11,7 +11,9 @@
     else {
         document.getElementById("statusBar").innerText = "Your rival makes a move...";
     }
-}
+
+    bus.trigger('signalr-join-game', { gameId: data.gameId, username: data.player.username });
+});
 
 function drawField(fieldContainerId, data, isRivalField) {
     var lines = 10;
@@ -41,15 +43,15 @@ function drawField(fieldContainerId, data, isRivalField) {
         table.appendChild(tr);
     }
     fieldContainer.appendChild(table);
-
-    var fieldData;
+    console.log(data);
     if (isRivalField) {
-        fieldData = data.rival.field.cells;
+        console.log(data.rival)
+        fillField(fieldContainerId, data.rival.field.cells, isRivalField);
     }
     else {
-        fieldData = data.player.field.cells;
+        console.log(data.player)
+        fillField(fieldContainerId, data.player.field.cells, isRivalField);
     }
-    fillField(fieldContainerId, fieldData, isRivalField);
 }
 
 function fillField(fieldContainerId, fieldData, isRivalField) {

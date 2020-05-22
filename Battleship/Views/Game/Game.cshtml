@@ -14,8 +14,14 @@
 
 @section Scripts{
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
-    <script src="~/js/initializeGame.js"></script>
     <script>
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/battleship")
+            .build();
+        hubConnection.start();
+       
+        var bus = $(window);
+
         $(document).ready(function () {
             var id = JSON.stringify(@ViewData["gameId"]);
             $.ajax({
@@ -26,7 +32,7 @@
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     console.log(data);
-                    InitializeGame(data);
+                    bus.trigger('initialize-game', data);
                 },
                 error: function (result) {
                     console.log(result);
@@ -34,8 +40,17 @@
             });
         });
     </script>
+    <script src="~/js/initializeGame.js"></script>
     <script>
+         bus.on('signalr-join-game', function (e, data) {
+             setTimeout(function () {
+                 hubConnection.invoke("JoinGame", data.gameId, data.username);
+             }, 500);  
+        });
 
+        hubConnection.on("joinGameLog", function (username, gameId) {
+            console.log(username + " joins game #" + gameId);
+        });
     </script>
 }
 <link rel="stylesheet" href="~/css/game.css" />
