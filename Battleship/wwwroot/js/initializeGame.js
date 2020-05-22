@@ -5,7 +5,7 @@
     setUsername("playerUsernameParagraph", data.player.username);
     setUsername("rivalUsernameParagraph", data.rival.username);
 
-    if (data.nextturnplayerid == data.player.playerId) {
+    if (data.nextTurnPlayerId == data.player.playerId) {
         document.getElementById("statusBar").innerText = "It's your turn!";
     }
     else {

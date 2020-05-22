@@ -77,7 +77,15 @@ namespace Battleship.Controllers
 
             if (lastStep != null)
             {
-                gameVM.NextTurnPlayerId = lastStep.PlayerId.Value;
+                if(lastStep.Hit == true)
+                {
+                    gameVM.NextTurnPlayerId = lastStep.PlayerId.Value;
+                }
+                else
+                {
+                    gameVM.NextTurnPlayerId = lastStep.PlayerId == gameVM.Player.PlayerId ?
+                         gameVM.Rival.PlayerId : gameVM.Player.PlayerId;
+                }
             }
             else
             {
