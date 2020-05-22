@@ -32,6 +32,14 @@ function drawField(fieldContainerId, data, isRivalField) {
             div.dataset.column = col;
 
             div.addEventListener('click', event => {
+                var stepVM = {
+                    "playerId": data.player.playerId,
+                    "rivalId": data.rival.playerId,
+                    "lineNo": parseInt(event.srcElement.dataset.line),
+                    "columnNo": parseInt(event.srcElement.dataset.column),
+                    "isHit" : false
+                }
+                hubConnection.invoke("MakeStep", stepVM, data.gameId);
                     console.log('line: ' + event.srcElement.dataset.line + ' col: '
                         + event.srcElement.dataset.column + ' state: ' + event.srcElement.className
                         + ' playerId: ' + data.player.playerId + ' rivalId: ' + data.rival.playerId);

@@ -1,6 +1,8 @@
 ﻿using Battleship.Domain.Interfaces;
+using Battleship.Models;
 using Battleship.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Battleship
@@ -21,6 +23,15 @@ namespace Battleship
             string groupName = gameId.ToString();
             await this.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
             await this.Clients.Group(groupName).SendAsync("joinGameLog", username, gameId);
+        }
+
+        public async Task MakeStep(StepViewModel stepVM, int gameId)
+        {
+            bool isHit = false;
+            bool isGameOver = false;
+
+            gameService.MakeMove(stepVM.LineNo, stepVM.ColumnNo, stepVM.PlayerId, stepVM.RivalId, out isHit, out isGameOver);
+            await this.Clients.All.SendAsync("Send", "!!!!!!");
         }
     }
 }
