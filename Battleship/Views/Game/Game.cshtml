@@ -36,7 +36,6 @@
                 success: function (data) {
                     PLAYER_ID = data.player.playerId;
                     RIVAL_ID = data.rival.playerId;
-
                     bus.trigger('initialize-game', data);
                 },
                 error: function (result) {
@@ -57,6 +56,10 @@
             receiveStep(stepVM);
         });
 
+        hubConnection.on("endGame", function (stepVM) {
+            receiveStep(stepVM);
+            endGame(stepVM.playerId);
+        })
         hubConnection.on("joinGameLog", function (username, gameId) {
             console.log(username + " joins game #" + gameId);
         });
