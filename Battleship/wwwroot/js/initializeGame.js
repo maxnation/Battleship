@@ -87,15 +87,17 @@ function setCellClass(cell, state, isRivalField) {
     }
 }
 
-function switchControl(nextPlayerId) {
+function switchControl(nextPlayerId, extraMessage) {
+    let message;
     if (nextPlayerId == PLAYER_ID) {
-        document.getElementById("statusBar").innerText = "It's your turn!";
+         message = extraMessage == undefined ? "It's your turn!" : extraMessage
         unfreezeRivalField();
     }
     else {
-        document.getElementById("statusBar").innerText = "Your rival makes a move...";
+        message = extraMessage == undefined ? "Your rival makes a move..." : extraMessage;
         freezeRivalField();
     }
+    setStatusBarMessage(message);
 }
 
 function freezeRivalField() {
@@ -104,4 +106,8 @@ function freezeRivalField() {
 
 function unfreezeRivalField() {
     document.getElementById("rivalField").style.pointerEvents = 'visible'; 
+}
+
+function setStatusBarMessage(message) {
+    document.getElementById("statusBar").innerText = message == undefined ? "It's your turn!" : message;
 }
