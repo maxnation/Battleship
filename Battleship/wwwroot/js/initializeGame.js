@@ -111,3 +111,32 @@ function unfreezeRivalField() {
 function setStatusBarMessage(message) {
     document.getElementById("statusBar").innerText = message == undefined ? "It's your turn!" : message;
 }
+
+function receiveStep(stepVM) {
+    let newState;
+    if (stepVM.isHit) {
+        newState = "Hit";
+    }
+    else {
+        newState = "Miss";
+    }
+
+    if (stepVM.playerId == PLAYER_ID) {
+        let rivalCell = document.querySelector('#rivalField' + ' [data-line="' + stepVM.lineNo + '"][data-column="' + stepVM.columnNo + '"]');
+        setCellClass(rivalCell, newState, true);
+
+        if (newState == "Hit") {
+            setStatusBarMessage("Hit! You go again!");
+        }
+        else if (newState == "Miss") {
+            switchControl(RIVAL_ID, "You missed! Your rival makes a move...");
+        }
+    }
+    else if (stepVM.playerId == RIVAL_ID) {
+        let playerCell = document.querySelector('#playerField' + ' [data-line="' + stepVM.lineNo + '"][data-column="' + stepVM.columnNo + '"]');
+        setCellClass(playerCell, newState, false);
+        if (newState != "Hit") {
+            switchControl(PLAYER_ID, "It's your turn");
+        }
+    }
+}

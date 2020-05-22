@@ -22,7 +22,7 @@
             .withUrl("/battleship")
             .build();
         hubConnection.start();
-       
+
         var bus = $(window);
 
         $(document).ready(function () {
@@ -47,39 +47,14 @@
     </script>
     <script src="~/js/initializeGame.js"></script>
     <script>
-         bus.on('signalr-join-game', function (e, data) {
-             setTimeout(function () {
-                 hubConnection.invoke("JoinGame", data.gameId, data.username);
-             }, 500);  
+        bus.on('signalr-join-game', function (e, data) {
+            setTimeout(function () {
+                hubConnection.invoke("JoinGame", data.gameId, data.username);
+            }, 500);
         });
 
         hubConnection.on("receiveStep", function (stepVM) {
-            let newState;
-            if (stepVM.isHit) {
-                newState = "Hit";
-            }
-            else {
-                newState = "Miss";
-            }
-
-            if (stepVM.playerId == PLAYER_ID) {    
-                let rivalCell = document.querySelector('#rivalField' + ' [data-line="' + stepVM.lineNo + '"][data-column="' + stepVM.columnNo + '"]');
-                setCellClass(rivalCell, newState, true);
-
-                if (newState == "Hit") {
-                    setStatusBarMessage("Hit! You go again!");
-                }
-                else if (newState == "Miss") {
-                    switchControl(RIVAL_ID, "You missed! Your rival makes a move...");
-                }
-            }
-            else if (stepVM.playerId == RIVAL_ID) {       
-                let playerCell = document.querySelector('#playerField' + ' [data-line="' + stepVM.lineNo + '"][data-column="' + stepVM.columnNo + '"]');         
-                setCellClass(playerCell, newState, false);
-                if (newState != "Hit") {
-                    switchControl(PLAYER_ID, "It's your turn");
-                }
-            }
+            receiveStep(stepVM);
         });
 
         hubConnection.on("joinGameLog", function (username, gameId) {
