@@ -33,7 +33,14 @@ namespace Battleship
             gameService.MakeMove(stepVM.LineNo, stepVM.ColumnNo, stepVM.PlayerId, stepVM.RivalId, out isHit, out isGameOver);
             stepVM.IsHit = isHit;
 
-            await this.Clients.Group(gameId.ToString()).SendAsync("receiveStep", stepVM);
+            if (!isGameOver)
+            {
+                await this.Clients.Group(gameId.ToString()).SendAsync("receiveStep", stepVM);
+            }
+            else
+            {
+                await this.Clients.Group(gameId.ToString()).SendAsync("endGame", stepVM);
+            }
         }
     }
 }
