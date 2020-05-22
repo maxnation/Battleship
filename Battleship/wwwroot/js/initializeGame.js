@@ -1,6 +1,6 @@
 ﻿function InitializeGame(data) {
-    drawField("playerField", data.player.field.cells, false);
-    drawField("rivalField", data.rival.field.cells, true);
+    drawField("playerField", data, false);
+    drawField("rivalField", data, true);
 
     setUsername("playerUsernameParagraph", data.player.username);
     setUsername("rivalUsernameParagraph", data.rival.username);
@@ -13,7 +13,7 @@
     }
 }
 
-function drawField(fieldContainerId, fieldData, isRivalField) {
+function drawField(fieldContainerId, data, isRivalField) {
     var lines = 10;
     var columns = 10;
 
@@ -32,7 +32,7 @@ function drawField(fieldContainerId, fieldData, isRivalField) {
             div.addEventListener('click', event => {
                     console.log('line: ' + event.srcElement.dataset.line + ' col: '
                         + event.srcElement.dataset.column + ' state: ' + event.srcElement.className
-                        + ' playerId: ' + playerId + ' rivalId: ' + rivalId);
+                        + ' playerId: ' + data.player.playerId + ' rivalId: ' + data.rival.playerId);
                 });
 
             td.appendChild(div);
@@ -42,6 +42,13 @@ function drawField(fieldContainerId, fieldData, isRivalField) {
     }
     fieldContainer.appendChild(table);
 
+    var fieldData;
+    if (isRivalField) {
+        fieldData = data.rival.field.cells;
+    }
+    else {
+        fieldData = data.player.field.cells;
+    }
     fillField(fieldContainerId, fieldData, isRivalField);
 }
 

@@ -16,11 +16,8 @@
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
     <script src="~/js/initializeGame.js"></script>
     <script>
-        var id;
-        var playerId;
-        var rivalId;
         $(document).ready(function () {
-             id = JSON.stringify(@ViewData["gameId"]);
+            var id = JSON.stringify(@ViewData["gameId"]);
             $.ajax({
                 url: '@Url.Action("GetGameData", "Game")',
                 data: id,
@@ -29,8 +26,6 @@
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     console.log(data);
-                    playerId = data.player.playerId;
-                    rivalId = data.rival.playerId;
                     InitializeGame(data);
                 },
                 error: function (result) {
