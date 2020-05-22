@@ -164,11 +164,17 @@ namespace Battleship.Infrastructure.Business
             isGameOver = false;
             int totalXP;
             this.GetRivalXP(rivalId, out totalXP);
+            
             if (totalXP == 0)
             {
-                Player player = unitOfWork.PlayerRepository.FindById(playerId);
-                player.IsWinner = true; 
-                unitOfWork.PlayerRepository.Update(player);
+                Player player = unitOfWork.PlayerRepository.
+                    GetQueryable().Include(p=>p.Game)
+                    .FirstOrDefault(p=>p.Id == playerId);
+                
+                player.IsWinner = true;
+                player.Game.State = GameState.Finished;
+                unitOfWork.PlayerRepository.Update(player);               
+                
                 isGameOver = true;
             }
         }
