@@ -19,10 +19,12 @@ function drawField() {
         var tr = document.createElement("tr");
         for (var col = 0; col < columns; col++) {
             var td = document.createElement("td");
-            td.dataset.line = line;
-            td.dataset.column = col;
+         
             var div = document.createElement("div");
             div.className = "freeCell";
+            div.dataset.line = line;
+            div.dataset.column = col;
+
             td.appendChild(div);
             tr.appendChild(td);
         }

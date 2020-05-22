@@ -24,10 +24,17 @@ function drawField(fieldContainerId, fieldData, isRivalField) {
         var tr = document.createElement("tr");
         for (var col = 0; col < columns; col++) {
             var td = document.createElement("td");
-            td.dataset.line = line;
-            td.dataset.column = col;
             var div = document.createElement("div");
             div.className = "freeCell";
+            div.dataset.line = line;
+            div.dataset.column = col;
+
+            div.addEventListener('click', event => {
+                    console.log('line: ' + event.srcElement.dataset.line + ' col: '
+                        + event.srcElement.dataset.column + ' state: ' + event.srcElement.className
+                        + ' playerId: ' + playerId + ' rivalId: ' + rivalId);
+                });
+
             td.appendChild(div);
             tr.appendChild(td);
         }
@@ -41,7 +48,7 @@ function drawField(fieldContainerId, fieldData, isRivalField) {
 function fillField(fieldContainerId, fieldData, isRivalField) {
     for (let i = 0; i < fieldData.length; i++) {
         let cell = document.querySelector('#' + fieldContainerId + ' [data-line="' + fieldData[i].lineNo + '"][data-column="' + fieldData[i].columnNo + '"]');
-        setCellClass(cell.firstChild, fieldData[i].state, isRivalField);
+        setCellClass(cell, fieldData[i].state, isRivalField);
     }
 }
 
