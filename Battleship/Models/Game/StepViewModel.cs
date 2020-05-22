@@ -2,7 +2,7 @@
 {
     public class StepViewModel
     {
-        public int PlayerId;
+        public int PlayerId { get; set; }
 
         public int RivalId { get; set; }
 
