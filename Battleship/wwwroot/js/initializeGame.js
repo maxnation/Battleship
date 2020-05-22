@@ -5,7 +5,7 @@
     setUsername("playerUsernameParagraph", data.player.username);
     setUsername("rivalUsernameParagraph", data.rival.username);
     this.switchControl(data.nextTurnPlayerId);
- 
+
     bus.trigger('signalr-join-game', { gameId: data.gameId, username: data.player.username });
 });
 
@@ -31,10 +31,10 @@ function drawField(fieldContainerId, data, isRivalField) {
                     "rivalId": data.rival.playerId,
                     "lineNo": parseInt(event.srcElement.dataset.line),
                     "columnNo": parseInt(event.srcElement.dataset.column),
-                    "isHit" : false
+                    "isHit": false
                 }
                 hubConnection.invoke("MakeStep", stepVM, data.gameId);
-                });
+            });
             td.appendChild(div);
             tr.appendChild(td);
         }
@@ -73,7 +73,7 @@ function setCellClass(cell, state, isRivalField) {
             else {
                 cell.className = "occupiedCell";
             }
-            break;    
+            break;
         case "Miss":
             cell.className = "missCell";
             break;
@@ -83,14 +83,14 @@ function setCellClass(cell, state, isRivalField) {
             }
             else {
                 cell.className = "playerHitCell";
-            }            break;
+            } break;
     }
 }
 
 function switchControl(nextPlayerId, extraMessage) {
     let message;
     if (nextPlayerId == PLAYER_ID) {
-         message = extraMessage == undefined ? "It's your turn!" : extraMessage
+        message = extraMessage == undefined ? "It's your turn!" : extraMessage
         unfreezeRivalField();
     }
     else {
@@ -105,7 +105,7 @@ function freezeRivalField() {
 }
 
 function unfreezeRivalField() {
-    document.getElementById("rivalField").style.pointerEvents = 'visible'; 
+    document.getElementById("rivalField").style.pointerEvents = 'visible';
 }
 
 function setStatusBarMessage(message) {
@@ -138,5 +138,29 @@ function receiveStep(stepVM) {
         if (newState != "Hit") {
             switchControl(PLAYER_ID, "It's your turn");
         }
+    }
+}
+
+function endGame(winnerId) {
+    var isWinner;
+    if (winnerId == PLAYER_ID) {
+        setStatusBarMessage("You are a winner!");
+        isWinner = true;
+    }
+    else {
+        setStatusBarMessage("You lose!");
+        isWinner = false;
+    }
+    setGameOverState(isWinner)
+}
+
+function setGameOverState(isWinner) {
+    document.getElementById("rivalField").style.pointerEvents = 'none';
+    let statusBar = document.getElementById("statusBar");
+    if (isWinner) {
+        statusBar.style.color = '#21DA2A'
+    }
+    else {
+        statusBar.style.color = '#D2270F'
     }
 }
