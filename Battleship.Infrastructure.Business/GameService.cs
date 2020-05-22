@@ -166,7 +166,8 @@ namespace Battleship.Infrastructure.Business
             this.GetRivalXP(rivalId, out totalXP);
             if (totalXP == 0)
             {
-                Player player = new Player { Id = playerId, IsWinner = true };
+                Player player = unitOfWork.PlayerRepository.FindById(playerId);
+                player.IsWinner = true; 
                 unitOfWork.PlayerRepository.Update(player);
                 isGameOver = true;
             }
