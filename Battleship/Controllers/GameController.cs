@@ -7,6 +7,7 @@ using Battleship.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +18,12 @@ namespace Battleship.Controllers
     {
         private readonly IUnitOfWork uof;
         private readonly IGameService gameService;
+        private static Dictionary<int, int> firstStepPlayers;
+
+        static GameController()
+        {
+            firstStepPlayers = new Dictionary<int, int>();
+        }
 
         public GameController(IUnitOfWork uof, IGameService gameService)
         {
@@ -68,10 +75,10 @@ namespace Battleship.Controllers
 
         public JsonResult GetGameData([FromBody] int id)
         {
-
             GameViewModel gameVM = GameMap.GetGameViewModel(uof.GameRepository, User.Identity.Name, id);
             Step lastStep = uof.StepRepository
-                .GetQueryable().OrderByDescending(s => s.StepNo)
+                .GetQueryable().Where(s=>s.PlayerId == gameVM.Player.PlayerId || s.PlayerId == gameVM.Rival.PlayerId)
+                .OrderByDescending(s => s.StepNo)
                 .Take(1)
                 .FirstOrDefault();
 
@@ -89,8 +96,17 @@ namespace Battleship.Controllers
             }
             else
             {
-                int randomVal = 1; //new Random().Next(0, 2);
-                gameVM.NextTurnPlayerId = randomVal == 0 ? gameVM.Player.PlayerId : gameVM.Rival.PlayerId;
+                if (firstStepPlayers.ContainsKey(gameVM.GameId))
+                {
+                    gameVM.NextTurnPlayerId = firstStepPlayers[gameVM.GameId];
+                }
+                else
+                {
+                    int randomVal = new Random(Guid.NewGuid().GetHashCode()).Next(0, 2);
+                    gameVM.NextTurnPlayerId = randomVal == 0 ? gameVM.Player.PlayerId : gameVM.Rival.PlayerId;
+                    firstStepPlayers[gameVM.GameId] = gameVM.NextTurnPlayerId;
+                    firstStepPlayers.Remove(gameVM.GameId);
+                }                 
             }
 
             return Json(gameVM);
