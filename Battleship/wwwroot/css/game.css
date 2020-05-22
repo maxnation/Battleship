@@ -54,6 +54,7 @@ div.occupiedCell {
 
 div.missCell {
   background-image: url('../pics/cellstates/misscell.png');
+  pointer-events: none
 }
 
 div.playerHitCell {
@@ -62,9 +63,15 @@ div.playerHitCell {
 
 div.rivalHitCell {
     background-image: url('../pics/cellstates/rivalHitCell.png');
+    pointer-events: none;
 }
 
 #playerPanel{
     float: left;
     margin-right: 300px;
+    pointer-events:none;
+}
+
+#rivalPanel {
+    margin-left: 300px;
 }
