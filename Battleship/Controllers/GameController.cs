@@ -99,13 +99,13 @@ namespace Battleship.Controllers
                 if (firstStepPlayers.ContainsKey(gameVM.GameId))
                 {
                     gameVM.NextTurnPlayerId = firstStepPlayers[gameVM.GameId];
+                    firstStepPlayers.Remove(gameVM.GameId);
                 }
                 else
                 {
                     int randomVal = new Random(Guid.NewGuid().GetHashCode()).Next(0, 2);
                     gameVM.NextTurnPlayerId = randomVal == 0 ? gameVM.Player.PlayerId : gameVM.Rival.PlayerId;
                     firstStepPlayers[gameVM.GameId] = gameVM.NextTurnPlayerId;
-                    firstStepPlayers.Remove(gameVM.GameId);
                 }                 
             }
 
