@@ -21,6 +21,8 @@ namespace Battleship.Services.Interfaces
 
         Game JoinGame(int gameId, ApplicationUser user);
 
-        void GetUserGamesList(string username, out IEnumerable<Game> userFreeGames, out IEnumerable<Game> othersFreeGames, out IEnumerable<Game> activeGames);     
+        void GetUserGamesList(string username, out IEnumerable<Game> userFreeGames, out IEnumerable<Game> othersFreeGames, out IEnumerable<Game> activeGames);
+
+        List<Game> GetGameDataForStatistics();
     }
 }

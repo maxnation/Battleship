@@ -2,7 +2,6 @@
 using Battleship.Domain.Interfaces;
 using Battleship.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -147,7 +146,7 @@ namespace Battleship.Infrastructure.Business
             out bool isHit, out bool isGameOver)
         {
             isGameOver = false;
-            
+
             Cell cell = unitOfWork.CellRepository
                 .GetQueryable().Include(c => c.Ship)
                 .FirstOrDefault(c => c.LineNo == lineNo && c.ColumnNo == columnNo
@@ -155,7 +154,7 @@ namespace Battleship.Infrastructure.Business
 
             this.ChangeCellState(cell, out isHit, rivalId, playerId, out isGameOver);
             this.SaveStep(playerId, rivalId, cell.Id, isHit);
-          
+
             return isHit;
         }
 
@@ -164,17 +163,17 @@ namespace Battleship.Infrastructure.Business
             isGameOver = false;
             int totalXP;
             this.GetRivalXP(rivalId, out totalXP);
-            
+
             if (totalXP == 0)
             {
                 Player player = unitOfWork.PlayerRepository.
-                    GetQueryable().Include(p=>p.Game)
-                    .FirstOrDefault(p=>p.Id == playerId);
-                
+                    GetQueryable().Include(p => p.Game)
+                    .FirstOrDefault(p => p.Id == playerId);
+
                 player.IsWinner = true;
                 player.Game.State = GameState.Finished;
-                unitOfWork.PlayerRepository.Update(player);               
-                
+                unitOfWork.PlayerRepository.Update(player);
+
                 isGameOver = true;
             }
         }
@@ -203,8 +202,8 @@ namespace Battleship.Infrastructure.Business
                   .Include(f => f.Cells).ThenInclude(c => c.Ship)
                   .FirstOrDefault(f => f.PlayerId == rivalId)
                   .Cells.Select(c => c.Ship).Distinct();
-            totalXP = ships.Sum(s => s!=null? s.XP : 0);
-         }
+            totalXP = ships.Sum(s => s != null ? s.XP : 0);
+        }
 
         private void SaveStep(int playerId, int rivalId, int cellId, bool isHit)
         {
@@ -269,6 +268,48 @@ namespace Battleship.Infrastructure.Business
                 .Select(p => p.Game)
                 .Where(g => g.State == GameState.Playing)?
                 .ToList();
+        }
+
+        public List<Game> GetGameDataForStatistics()
+        {
+            return unitOfWork.GameRepository.GetQueryable()
+                .Where(g => g.State == GameState.Finished)
+                .Include(g => g.Players)
+                .ThenInclude(p => p.Steps).ThenInclude(s => s.Cell).ThenInclude(c => c.Ship)
+                .Include(g => g.Players).ThenInclude(p => p.User)
+                .Include(g=>g.Players).ThenInclude(p=>p.Field).ThenInclude(f=>f.Cells).ThenInclude(c=>c.Ship)
+                .Select(g => new Game
+                {
+                    Id = g.Id,
+                    Players = g.Players.Select(p => new Player
+                    {
+                        User = new ApplicationUser { Email = p.User.Email },
+                        IsWinner = p.IsWinner,
+                        Field =  new Field 
+                        {
+                            Cells = p.Field.Cells.Select(c=>new Cell 
+                            { 
+                                State = c.State,
+                                Ship = c.Ship
+                            }
+                            ).ToList()
+                        } ,
+                        Steps = p.Steps
+                        .Select(s => new Step
+                        {
+                            Cell = new Cell
+                            {
+                                Ship = new Ship
+                                {
+                                    Id = s.Cell.Ship.Id,
+                                    Size = s.Cell.Ship.Size,
+                                    XP = s.Cell.Ship.XP
+                                },
+                                State = s.Cell.State
+                            }
+                        }).ToList()
+                    }).ToList()
+                }).ToList();
         }
     }
 }
