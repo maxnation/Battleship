@@ -77,14 +77,14 @@ namespace Battleship.Controllers
         {
             GameViewModel gameVM = GameMap.GetGameViewModel(uof.GameRepository, User.Identity.Name, id);
             Step lastStep = uof.StepRepository
-                .GetQueryable().Where(s=>s.PlayerId == gameVM.Player.PlayerId || s.PlayerId == gameVM.Rival.PlayerId)
+                .GetQueryable().Where(s => s.PlayerId == gameVM.Player.PlayerId || s.PlayerId == gameVM.Rival.PlayerId)
                 .OrderByDescending(s => s.StepNo)
                 .Take(1)
                 .FirstOrDefault();
 
             if (lastStep != null)
             {
-                if(lastStep.Hit == true)
+                if (lastStep.Hit == true)
                 {
                     gameVM.NextTurnPlayerId = lastStep.PlayerId.Value;
                 }
@@ -106,7 +106,7 @@ namespace Battleship.Controllers
                     int randomVal = new Random(Guid.NewGuid().GetHashCode()).Next(0, 2);
                     gameVM.NextTurnPlayerId = randomVal == 0 ? gameVM.Player.PlayerId : gameVM.Rival.PlayerId;
                     firstStepPlayers[gameVM.GameId] = gameVM.NextTurnPlayerId;
-                }                 
+                }
             }
 
             return Json(gameVM);
@@ -175,6 +175,13 @@ namespace Battleship.Controllers
                 OthersFreeGames = otherFreeGamesDescriptions
             };
             return View(gListVM);
+        }
+
+        public IActionResult Statistics()
+        {
+            IEnumerable<Game> gameData = gameService.GetGameDataForStatistics();
+            IEnumerable<GameStatisticsViewModel> gameStatisticsViewModel = GameMap.GetGameStatisticsViewModel(gameData);
+            return View(gameStatisticsViewModel);
         }
     }
 }
