@@ -3,6 +3,7 @@ using Battleship.Domain.Interfaces;
 using Battleship.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Battleship.Mapping
@@ -59,4 +60,18 @@ namespace Battleship.Mapping
             return gameVM;
         }
     }
+
+    internal class ShipsEqualityComparer : IEqualityComparer<Ship>
+    {
+        public bool Equals([DisallowNull] Ship x, [DisallowNull] Ship y)
+        {
+            return x.Id == y.Id;
+        }
+
+        public int GetHashCode([DisallowNull] Ship obj)
+        {
+            return obj.Id.GetHashCode();
+        }
+    }
 }
+
