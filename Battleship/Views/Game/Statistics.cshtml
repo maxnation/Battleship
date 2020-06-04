@@ -1,0 +1,83 @@
+﻿@model IEnumerable<GameStatisticsViewModel>
+
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+<h2>Statistics</h2>
+<p id="tumblrMessage">Show only my games</p>
+<div class="switch-btn switch-off"></div>
+
+<div id="allGamesContainer">
+    @if (Model.Count() == 0)
+    {
+        <p class="emptyGamesListMessage">Game story is empty</p>
+    }
+    else
+    {
+        @foreach (var game in Model)
+        {
+            <div class="gameStateBlock">
+                <p>Game no: @game.GameNo</p>
+                <p>Winner: @game.WinnerUsername</p>
+                <p>Loser: @game.LoserUsername</p>
+                <p>Number of moves: @game.NumberOfMovesInGame</p>
+                <p>Total ships survived: @game.TotalShipsSurvived</p>
+                <p>Total XP: @game.TotalXP</p>
+                <details>
+                    <summary>Winner's ships state</summary>
+                    <ol>
+                        @for (int i = 0; i < game.WinnerShips.Length; i++)
+                        {
+                            <li>
+                                <p>@game.WinnerShips[i].XP / @game.WinnerShips[i].Size</p>
+                            </li>
+                        }
+                    </ol>
+                </details>
+            </div>
+        }
+    }
+
+</div>
+
+<div id="userOnlyGamesContainer">
+    @{
+        var userGames = Model.Where(g => g.WinnerUsername == User.Identity.Name || g.LoserUsername == User.Identity.Name).ToList();
+        if (userGames.Count() == 0)
+        {
+            <p class="emptyGamesListMessage">Your game story is empty</p>
+        }
+        else
+        {
+            @foreach (var game in Model.Where(g => g.WinnerUsername == User.Identity.Name || g.LoserUsername == User.Identity.Name))
+            {
+                <div class="gameStateBlock">
+                    <p>Game no: @game.GameNo</p>
+                    <p>Winner: @game.WinnerUsername</p>
+                    <p>Loser: @game.LoserUsername</p>
+                    <p>Number of moves: @game.NumberOfMovesInGame</p>
+                    <p>Total ships survived: @game.TotalShipsSurvived</p>
+                    <p>Total XP: @game.TotalXP</p>
+                    <details>
+                        <summary>Winner's ships state</summary>
+                        <ol>
+                            @for (int i = 0; i < game.WinnerShips.Length; i++)
+                            {
+                                <li>
+                                    <p>@game.WinnerShips[i].XP / @game.WinnerShips[i].Size</p>
+                                </li>
+                            }
+                        </ol>
+                    </details>
+                </div>
+            }
+        }
+    }
+
+</div>
+<link href="~/css/game.css" rel="stylesheet" />
+<link href="~/css/switchButton.css" rel="stylesheet" />
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/statistics.js"></script>
