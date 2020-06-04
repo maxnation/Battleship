@@ -2,7 +2,6 @@
 using Battleship.Domain.Interfaces;
 using Battleship.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,10 +30,11 @@ namespace Battleship.Infrastructure.Business
             {
                 game.State = GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated;
             }
-            else if (game.State == (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
+            else if (game.State == GameState.WaitingForBothFieldsCreated)
             {
                 game.State = GameState.Playing;
             }
+            unitOfWork.GameRepository.Update(game);
             var occupiedCells = ships.SelectMany(s => s.Cells);
 
             foreach (var c in occupiedCells)
@@ -142,31 +142,100 @@ namespace Battleship.Infrastructure.Business
             return this.JoinGame(gameId, user.Id);
         }
 
-        public bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId)
+        public bool MakeMove(int lineNo, int columnNo, int playerId, int rivalId,
+            out bool isHit, out bool isGameOver)
         {
-            bool hit = false;
+            isGameOver = false;
 
-            int fieldId = unitOfWork.FieldRepository.Get(f => f.PlayerId == rivalId).First().Id;
+            Cell cell = unitOfWork.CellRepository
+                .GetQueryable().Include(c => c.Ship)
+                .FirstOrDefault(c => c.LineNo == lineNo && c.ColumnNo == columnNo
+                 && c.Field.PlayerId == rivalId);
 
-            Cell cell = unitOfWork.CellRepository.FirstOrDefault(c => c.FieldId == fieldId && c.LineNo == lineNo && c.ColumnNo == columnNo);
+            this.ChangeCellState(cell, out isHit, rivalId, playerId, out isGameOver);
+            this.SaveStep(playerId, rivalId, cell.Id, isHit);
 
-            Step step = new Step { CellId = cell.Id, PlayerId = playerId };
+            return isHit;
+        }
 
+        private void CheckRivalXP(int rivalId, int playerId, out bool isGameOver)
+        {
+            isGameOver = false;
+            int totalXP;
+            this.GetRivalXP(rivalId, out totalXP);
+
+            if (totalXP == 0)
+            {
+                Player player = unitOfWork.PlayerRepository.
+                    GetQueryable().Include(p => p.Game)
+                    .FirstOrDefault(p => p.Id == playerId);
+
+                player.IsWinner = true;
+                player.Game.State = GameState.Finished;
+                unitOfWork.PlayerRepository.Update(player);
+
+                isGameOver = true;
+            }
+        }
+
+        private void ChangeCellState(Cell cell, out bool isHit, int rivalId, int playerId, out bool isGameOver)
+        {
+            isHit = false;
+            isGameOver = false;
             if (cell.State == CellState.Free)
             {
                 cell.State = CellState.Miss;
-                step.Hit = hit = false;
             }
             else if (cell.State == CellState.Occupied)
             {
                 cell.State = CellState.Hit;
-                step.Hit = hit = true;
+                isHit = true;
+                this.SubtractShipXP(cell.Ship);
+                this.CheckRivalXP(rivalId, playerId, out isGameOver);
+            }
+            unitOfWork.CellRepository.Update(cell);
+        }
+
+        private void GetRivalXP(int rivalId, out int totalXP)
+        {
+            var ships = unitOfWork.FieldRepository.GetQueryable()
+                  .Include(f => f.Cells).ThenInclude(c => c.Ship)
+                  .FirstOrDefault(f => f.PlayerId == rivalId)
+                  .Cells.Select(c => c.Ship).Distinct();
+            totalXP = ships.Sum(s => s != null ? s.XP : 0);
+        }
+
+        private void SaveStep(int playerId, int rivalId, int cellId, bool isHit)
+        {
+            int lastStepNo;
+            var query = unitOfWork.StepRepository
+                .GetQueryable()
+                .Where(s => s.PlayerId == playerId || s.PlayerId == rivalId);
+
+            if (query.Any())
+            {
+                lastStepNo = query.Max(s => s.StepNo);
+            }
+            else
+            {
+                lastStepNo = 0;
             }
 
-            unitOfWork.StepRepository.Create(step);
-            unitOfWork.CellRepository.Update(cell);
+            Step step = new Step
+            {
+                CellId = cellId,
+                PlayerId = playerId,
+                StepNo = ++lastStepNo,
+                Hit = isHit
+            };
 
-            return hit;
+            unitOfWork.StepRepository.Create(step);
+        }
+
+        private void SubtractShipXP(Ship ship)
+        {
+            ship.XP--;
+            unitOfWork.ShipRepository.Update(ship);
         }
 
         public void GetUserGamesList(string username,
@@ -183,12 +252,14 @@ namespace Battleship.Infrastructure.Business
             // Games of current User without second player
             userFreeGames = user.Players
                .Select(p => p.Game)
-               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer))
+               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer) ||
+               g.State == (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
                .ToList();
 
             // Games of other Users without second player
             othersFreeGames = unitOfWork.GameRepository.GetQueryable()
-               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer))
+               .Where(g => g.State == (GameState.Created | GameState.WaitingForSecondPlayer) ||
+               g.State == (GameState.WaitingForSecondPlayer | GameState.WaitingForBothFieldsCreated))
                .Where(g => g.Players.FirstOrDefault().User.Id != user.Id).Include(g => g.Players).ThenInclude(p => p.User)
                .ToList();
 
@@ -197,6 +268,48 @@ namespace Battleship.Infrastructure.Business
                 .Select(p => p.Game)
                 .Where(g => g.State == GameState.Playing)?
                 .ToList();
+        }
+
+        public List<Game> GetGameDataForStatistics()
+        {
+            return unitOfWork.GameRepository.GetQueryable()
+                .Where(g => g.State == GameState.Finished)
+                .Include(g => g.Players)
+                .ThenInclude(p => p.Steps).ThenInclude(s => s.Cell).ThenInclude(c => c.Ship)
+                .Include(g => g.Players).ThenInclude(p => p.User)
+                .Include(g=>g.Players).ThenInclude(p=>p.Field).ThenInclude(f=>f.Cells).ThenInclude(c=>c.Ship)
+                .Select(g => new Game
+                {
+                    Id = g.Id,
+                    Players = g.Players.Select(p => new Player
+                    {
+                        User = new ApplicationUser { Email = p.User.Email },
+                        IsWinner = p.IsWinner,
+                        Field =  new Field 
+                        {
+                            Cells = p.Field.Cells.Select(c=>new Cell 
+                            { 
+                                State = c.State,
+                                Ship = c.Ship
+                            }
+                            ).ToList()
+                        } ,
+                        Steps = p.Steps
+                        .Select(s => new Step
+                        {
+                            Cell = new Cell
+                            {
+                                Ship = new Ship
+                                {
+                                    Id = s.Cell.Ship.Id,
+                                    Size = s.Cell.Ship.Size,
+                                    XP = s.Cell.Ship.XP
+                                },
+                                State = s.Cell.State
+                            }
+                        }).ToList()
+                    }).ToList()
+                }).ToList();
         }
     }
 }

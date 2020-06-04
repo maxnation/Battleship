@@ -1,0 +1,114 @@
+﻿table.gamesList{
+    margin-bottom: 20px;
+}
+
+.gamesList td, th{
+    width:150px;
+}
+
+.emptyGamesListMessage{
+    margin-top:10px;
+    color:gray;
+}
+
+#createGameBtn {
+    margin-bottom: 20px;
+}
+
+#statusBar {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#shipsPanel{
+    float:right;
+    width:40%;
+}
+
+#fieldPanel {
+    width: 60%;
+}
+
+div.gameStateBlock{
+    border-bottom: 1px solid lightgray;
+    padding-bottom:20px;
+    padding-top:20px;
+ }
+
+div.ship{
+    background-color: royalblue;
+    height: 30px;
+    border: 1px solid black;
+    display: block;
+    margin:0;
+    position: relative;
+}
+
+div.singledeck{
+width: 30px;
+}
+
+div.doubledeck {
+    width: 62px;
+}
+
+div.threedeck {
+    width: 94px;
+}
+
+div.fourdeck {
+    width: 126px;
+}
+
+.fieldContainer{
+    position:relative;
+}
+
+.fieldContainer table {
+    border: 1px solid red;
+}
+
+.fieldContainer div {
+    width: 30px;
+    height: 30px;
+}
+
+div.freeCell {
+    background-color: lightgray;
+}
+
+div.occupiedCell {
+    background-color: royalblue;
+}
+
+div.unavailableAsNeighbouringCell {
+    background-color: #BEBEBE;
+}
+
+div.missCell {
+  background-image: url('../pics/cellstates/misscell.png');
+  pointer-events: none
+}
+
+div.playerHitCell {
+    background-image: url('../pics/cellstates/playerHitCell.png');
+}
+
+div.rivalHitCell {
+    background-image: url('../pics/cellstates/rivalHitCell.png');
+    pointer-events: none;
+}
+
+#playerPanel{
+    float: left;
+    margin-right: 300px;
+    pointer-events:none;
+}
+
+#rivalPanel {
+    margin-left: 300px;
+}
+
+div.invalidlyPlaced {
+    background-color: red;
+}

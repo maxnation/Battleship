@@ -1,12 +1,13 @@
 ﻿using Battleship.Domain.Core;
 using Battleship.Domain.Interfaces;
+using Battleship.Mapping;
 using Battleship.Models;
 using Battleship.Models.FieldCreation;
 using Battleship.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,13 +18,19 @@ namespace Battleship.Controllers
     {
         private readonly IUnitOfWork uof;
         private readonly IGameService gameService;
+        private static Dictionary<int, int> firstStepPlayers;
+
+        static GameController()
+        {
+            firstStepPlayers = new Dictionary<int, int>();
+        }
 
         public GameController(IUnitOfWork uof, IGameService gameService)
         {
             this.uof = uof;
             this.gameService = gameService;
         }
-   
+
         [HttpGet]
         public IActionResult CreateGame()
         {
@@ -66,26 +73,49 @@ namespace Battleship.Controllers
             return Json(new { redirectToUrl = Url.Action("Index", "Game") });
         }
 
-        public IActionResult Game(int gameId)
+        public JsonResult GetGameData([FromBody] int id)
         {
-            uof.GameRepository.GetQueryable(g => g.Id == gameId)
-                .Include(g => g.Players)
-                .ThenInclude(p => p.Field)
-                .ThenInclude(f => f.Cells);
-            return View();
+            GameViewModel gameVM = GameMap.GetGameViewModel(uof.GameRepository, User.Identity.Name, id);
+            Step lastStep = uof.StepRepository
+                .GetQueryable().Where(s => s.PlayerId == gameVM.Player.PlayerId || s.PlayerId == gameVM.Rival.PlayerId)
+                .OrderByDescending(s => s.StepNo)
+                .Take(1)
+                .FirstOrDefault();
+
+            if (lastStep != null)
+            {
+                if (lastStep.Hit == true)
+                {
+                    gameVM.NextTurnPlayerId = lastStep.PlayerId.Value;
+                }
+                else
+                {
+                    gameVM.NextTurnPlayerId = lastStep.PlayerId == gameVM.Player.PlayerId ?
+                         gameVM.Rival.PlayerId : gameVM.Player.PlayerId;
+                }
+            }
+            else
+            {
+                if (firstStepPlayers.ContainsKey(gameVM.GameId))
+                {
+                    gameVM.NextTurnPlayerId = firstStepPlayers[gameVM.GameId];
+                    firstStepPlayers.Remove(gameVM.GameId);
+                }
+                else
+                {
+                    int randomVal = new Random(Guid.NewGuid().GetHashCode()).Next(0, 2);
+                    gameVM.NextTurnPlayerId = randomVal == 0 ? gameVM.Player.PlayerId : gameVM.Rival.PlayerId;
+                    firstStepPlayers[gameVM.GameId] = gameVM.NextTurnPlayerId;
+                }
+            }
+
+            return Json(gameVM);
         }
 
-        [HttpGet]
-        public IActionResult ContinueGame(int gameId)
+        public IActionResult Game(int id)
         {
-            Game game = uof.GameRepository.GetQueryable()
-                  .Include(g => g.Players)
-                  .ThenInclude(p => p.Field)
-                  .Include(g => g.Players)
-                  .ThenInclude(p => p.User)
-                  .First(g => g.Id == gameId);
-
-            return View();
+            ViewData["gameId"] = id;
+            return View("Game");
         }
 
         [HttpGet]
@@ -145,6 +175,13 @@ namespace Battleship.Controllers
                 OthersFreeGames = otherFreeGamesDescriptions
             };
             return View(gListVM);
+        }
+
+        public IActionResult Statistics()
+        {
+            IEnumerable<Game> gameData = gameService.GetGameDataForStatistics();
+            IEnumerable<GameStatisticsViewModel> gameStatisticsViewModel = GameMap.GetGameStatisticsViewModel(gameData);
+            return View(gameStatisticsViewModel);
         }
     }
 }

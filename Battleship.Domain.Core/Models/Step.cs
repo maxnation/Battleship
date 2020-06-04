@@ -13,5 +13,7 @@
         public Cell Cell { get; set; }
 
         public bool Hit { get; set; }
+
+        public int StepNo { get; set; }
     }
 }

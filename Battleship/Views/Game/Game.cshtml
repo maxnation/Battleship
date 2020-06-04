@@ -1,0 +1,68 @@
+﻿<h1>Game</h1>
+<h2 id="statusBar"></h2>
+<div id="playerPanel">
+    <p>Your field</p>
+    <p id="playerUsernameParagraph"></p>
+    <div class="fieldContainer" id="playerField">
+    </div>
+</div>
+<div id="rivalPanel">
+    <p>Rival's field</p>
+    <p id="rivalUsernameParagraph"></p>
+    <div class="fieldContainer" id="rivalField"></div>
+</div>
+
+@section Scripts{
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        var PLAYER_ID;
+        var RIVAL_ID;
+
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/battleship")
+            .build();
+        hubConnection.start();
+
+        var bus = $(window);
+
+        $(document).ready(function () {
+            var id = JSON.stringify(@ViewData["gameId"]);
+            $.ajax({
+                url: '@Url.Action("GetGameData", "Game")',
+                data: id,
+                dataType: "json",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    PLAYER_ID = data.player.playerId;
+                    RIVAL_ID = data.rival.playerId;
+                    bus.trigger('initialize-game', data);
+                },
+                error: function (result) {
+                    console.log(result);
+                }
+            });
+        });
+    </script>
+    <script src="~/js/initializeGame.js"></script>
+    <script>
+        bus.on('signalr-join-game', function (e, data) {
+            setTimeout(function () {
+                hubConnection.invoke("JoinGame", data.gameId, data.username);
+            }, 500);
+        });
+
+        hubConnection.on("receiveStep", function (stepVM) {
+            receiveStep(stepVM);
+        });
+
+        hubConnection.on("endGame", function (stepVM) {
+            receiveStep(stepVM);
+            endGame(stepVM.playerId);
+        })
+        hubConnection.on("joinGameLog", function (username, gameId) {
+            console.log(username + " joins game #" + gameId);
+        });
+    </script>
+}
+<link rel="stylesheet" href="~/css/game.css" />
