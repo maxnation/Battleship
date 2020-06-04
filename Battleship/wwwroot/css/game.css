@@ -49,17 +49,20 @@ width: 30px;
 }
 
 div.doubledeck {
-    width: 60px;
+    width: 62px;
 }
 
 div.threedeck {
-    width: 90px;
+    width: 94px;
 }
 
 div.fourdeck {
-    width: 120px;
+    width: 126px;
 }
 
+.fieldContainer{
+    position:relative;
+}
 
 .fieldContainer table {
     border: 1px solid red;
