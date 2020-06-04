@@ -78,6 +78,10 @@ div.occupiedCell {
     background-color: royalblue;
 }
 
+div.unavailableAsNeighbouringCell {
+    background-color: #BEBEBE;
+}
+
 div.missCell {
   background-image: url('../pics/cellstates/misscell.png');
   pointer-events: none
@@ -100,4 +104,8 @@ div.rivalHitCell {
 
 #rivalPanel {
     margin-left: 300px;
+}
+
+div.invalidlyPlaced {
+    background-color: red;
 }
