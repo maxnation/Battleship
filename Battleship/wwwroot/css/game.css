@@ -1,6 +1,23 @@
-﻿#statusBar{
-    text-align:center;
-    margin-bottom:30px;
+﻿table.gamesList{
+    margin-bottom: 20px;
+}
+
+.gamesList td, th{
+    width:150px;
+}
+
+.emptyGamesListMessage{
+    margin-top:10px;
+    color:gray;
+}
+
+#createGameBtn {
+    margin-bottom: 20px;
+}
+
+#statusBar {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 #shipsPanel{
@@ -12,10 +29,19 @@
     width: 60%;
 }
 
+div.gameStateBlock{
+    border-bottom: 1px solid lightgray;
+    padding-bottom:20px;
+    padding-top:20px;
+ }
+
 div.ship{
     background-color: royalblue;
     height: 30px;
     border: 1px solid black;
+    display: block;
+    margin:0;
+    position: relative;
 }
 
 div.singledeck{
