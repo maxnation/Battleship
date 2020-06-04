@@ -5,15 +5,7 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <p>@User.Identity.Name</p>
-
-    <button>
-        <a href="~/Game/CreateGame">Create Game</a>
-    </button>
-
-    <form method="post" asp-controller="Account" asp-action="Logout">
-        <input type="submit" value="Sign out" />
-    </form>
+    <p>Hi, @User.Identity.Name!</p>
 }
 else
 {
