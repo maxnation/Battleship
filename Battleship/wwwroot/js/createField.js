@@ -1,4 +1,10 @@
-﻿function CreateShipViewModel(size) {
+﻿let fieldSideLength = 10;
+let shipMap = new Map();
+let lastShipHeadsPositions = new Map();
+let field = document.getElementsByClassName("fieldContainer")[0];
+let shipArr = [];
+
+function CreateShipViewModel(size) {
     this.Size = size,
         this.Cells = []
 }
@@ -9,19 +15,16 @@ function CreateShipCellViewModel(line, column) {
 }
 
 function drawField() {
-    var lines = 10;
-    var columns = 10;
+    let table = document.createElement("table");
 
-    var fieldContainer = document.getElementsByClassName("fieldContainer")[0];
-    var table = document.createElement("table");
-
-    for (var line = 0; line < lines; line++) {
+    for (let line = 0; line < fieldSideLength; line++) {
         var tr = document.createElement("tr");
-        for (var col = 0; col < columns; col++) {
-            var td = document.createElement("td");
-         
-            var div = document.createElement("div");
-            div.className = "freeCell";
+
+        for (let col = 0; col < fieldSideLength; col++) {
+            let td = document.createElement("td");
+
+            let div = document.createElement("div");
+            div.className = "cell freeCell";
             div.dataset.line = line;
             div.dataset.column = col;
 
@@ -30,7 +33,7 @@ function drawField() {
         }
         table.appendChild(tr);
     }
-    fieldContainer.appendChild(table);
+    field.appendChild(table);
 }
 
 function drawShipsPanel() {
